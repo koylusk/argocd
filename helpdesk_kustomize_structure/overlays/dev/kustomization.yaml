@@ -1,0 +1,36 @@
+resources:
+- ../../base
+- services.yaml
+
+patches:
+- path: imageRef.yml
+  target:
+    kind: Deployment
+    name: helpdesk-backend-app-deployment
+- path: liveness.yaml
+  target:
+    kind: Deployment
+    name: helpdesk-backend-app-deployment
+- path: readiness.yaml
+  target:
+    kind: Deployment
+    name: helpdesk-backend-app-deployment
+- path: startupprobe.yaml
+  target:
+    kind: Deployment
+    name: helpdesk-backend-app-deployment
+- path: resources.yaml
+  target:
+    kind: Deployment
+    name: helpdesk-backend-app-deployment
+- path: replica.yaml
+  target:
+    kind: Deployment
+    name: helpdesk-backend-app-deployment
+- path: rollout.yaml
+  target:
+    kind: Deployment
+    name: helpdesk-backend-app-deployment
+
+
+

@@ -1,0 +1,17 @@
+apiVersion: v1
+data:
+  algorithm: HS256
+  aras_web_api_url: https://apitest.araskargo.com.tr/
+  bucket_name: helpdesk-testing-static
+  cdn_access_key: devopsuser
+  cdn_read_path: https://cdn-test.araskargo.com.tr/helpdesk-testing-static
+  cdn_secret_key: vpxf63QD25WnmB18
+  cdn_upload_url: cdn-test.araskargo.com.tr
+  cdn_use_ssl: true
+  db_name: HelpDeskDB
+  frontend_url: https://helpdesktest.araskargo.com.tr/
+  mongo_url: mongodb://helpDeskDBOwner:L1cDs52HD2mw659S@172.16.72.20:27017,172.16.72.21:27017,172.16.72.22:27017/?authMechanism=SCRAM-SHA-1&authSource=HelpDeskDB
+  secret: GoodSecretItIs
+kind: ConfigMap
+metadata:
+  name: app-config

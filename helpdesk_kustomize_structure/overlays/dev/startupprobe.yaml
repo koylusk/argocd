@@ -1,0 +1,21 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: helpdesk-backend-app-deployment
+  namespace: aras-helpdesk
+spec:
+  template:
+    spec:
+      containers:
+        - name: helpdesk-backend-container
+          startupProbe:
+            httpGet:
+              path: /info
+              port: 80
+            initialDelaySeconds: 5
+            failureThreshold: 15
+            periodSeconds: 5
+          
+          
+            
+

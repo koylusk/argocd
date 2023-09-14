@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helpdesk-backend-app-deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: helpdesk-backend-app-container
+          image: dockerregistry-test.araskargo.com.tr/helpdeskbackend:150
+          ports:
+            - containerPort: 80
+          imagePullPolicy: IfNotPresent
+      imagePullSecrets:
+        - name: nexus-test-repo    
+        

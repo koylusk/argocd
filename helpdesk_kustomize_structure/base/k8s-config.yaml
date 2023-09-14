@@ -1,0 +1,18 @@
+apiVersion: v1
+data:
+  APPLICATIONINSIGHTS_CONNECTION_STRING: InstrumentationKey=7e8e16b3-be21-452f-a6b9-6d24bf0e0d15;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/
+  CONTAINER_NAME: helpdesk-backend-container
+  DEPLOYMENT_APP_LABEL: c
+  DEPLOYMENT_NAME: helpdesk-backend-app-deployment
+  DEPLOYMENT_NAMESPACE: aras-helpdesk
+  DOCKER_CREDENTIAL_NAME: dockerregistry-test-credentials
+  DOCKER_REGISTRY: dockerregistry-test.araskargo.com.tr
+  IMAGE_NAME: helpdeskbackend
+  IMAGE_PULL_SECRETS_ID: nexus-test-repo
+  KUBERNETES_CREDENTIAL_ID: new_test_kubeconf_secret
+  TEMPLATE_DEPLOYMENT_FILE_PATH: backend/deployment.template.yml
+  TEMPLATE_DOCKER_FILE_PATH: backend/Dockerfile.template
+  TIMEZONE: Europe/Istanbul
+kind: ConfigMap
+metadata:
+  name: k8s-config

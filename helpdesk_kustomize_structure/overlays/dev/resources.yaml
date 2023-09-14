@@ -1,0 +1,19 @@
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: helpdesk-backend-app-deployment
+  namespace: aras-helpdesk
+spec:
+  template:
+    spec:
+      containers:
+        - name: helpdesk-backend-container
+          resources:
+            limits:
+              cpu: 500m
+              memory: 400Mi
+            requests:
+              cpu: 250m
+              memory: 200Mi
+

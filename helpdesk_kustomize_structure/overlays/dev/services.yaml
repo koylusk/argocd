@@ -1,0 +1,15 @@
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: helpdesk-backend-service
+  namespace: aras-helpdesk
+spec:
+  selector:
+    app: helpdesk-backend-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+

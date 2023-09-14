@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helpdesk-backend-app-deployment
+  namespace: aras-helpdesk
+spec:
+  selector:
+    matchLabels:
+      app: helpdesk-backend-app
+  template:
+    metadata:
+      labels:
+        app: helpdesk-backend-app
+    spec:
+      containers:
+      - env:
+        - name: CONTAINER_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: CONTAINER_NAME
+              name: k8s-config
+        - name: DOCKER_REGISTRY
+          valueFrom:
+            configMapKeyRef:
+              key: DOCKER_REGISTRY
+              name: k8s-config
+        - name: DOCKER_CREDENTIAL_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: DOCKER_CREDENTIAL_NAME
+              name: k8s-config
+        - name: IMAGE_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: IMAGE_NAME
+              name: k8s-config
+        - name: TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              key: TIMEZONE
+              name: k8s-config
+        - name: IMAGE_PULL_SECRETS_ID
+          valueFrom:
+            configMapKeyRef:
+              key: IMAGE_PULL_SECRETS_ID
+              name: k8s-config
+        - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+          valueFrom:
+            configMapKeyRef:
+              key: APPLICATIONINSIGHTS_CONNECTION_STRING
+              name: k8s-config
+        - name: secret
+          valueFrom:
+            configMapKeyRef:
+              key: secret
+              name: app-config
+        - name: algorithm
+          valueFrom:
+            configMapKeyRef:
+              key: algorithm
+              name: app-config
+        - name: mongo_url
+          valueFrom:
+            configMapKeyRef:
+              key: mongo_url
+              name: app-config
+        - name: db_name
+          valueFrom:
+            configMapKeyRef:
+              key: db_name
+              name: app-config
+        - name: aras_web_api_url
+          valueFrom:
+            configMapKeyRef:
+              key: aras_web_api_url
+              name: app-config
+        - name: frontend_url
+          valueFrom:
+            configMapKeyRef:
+              key: frontend_url
+              name: app-config
+        - name: cdn_upload_url
+          valueFrom:
+            configMapKeyRef:
+              key: cdn_upload_url
+              name: app-config
+        - name: cdn_read_path
+          valueFrom:
+            configMapKeyRef:
+              key: cdn_read_path
+              name: app-config
+        - name: cdn_access_key
+          valueFrom:
+            configMapKeyRef:
+              key: cdn_access_key
+              name: app-config
+        - name: cdn_secret_key
+          valueFrom:
+            configMapKeyRef:
+              key: cdn_secret_key
+              name: app-config
+        - name: cdn_use_ssl
+          valueFrom:
+            configMapKeyRef:
+              key: cdn_use_ssl
+              name: app-config
+        - name: bucket_name
+          valueFrom:
+            configMapKeyRef:
+              key: bucket_name
+              name: app-config

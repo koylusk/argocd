@@ -1,0 +1,7 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helpdesk-backend-app-deployment
+  namespace: aras-helpdesk
+spec:
+  replicas: 1

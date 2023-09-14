@@ -1,0 +1,119 @@
+pipeline {
+    # Using any available agent
+    agent any
+    
+    # Polling the SCM every 2 minutes to detect changes
+    triggers {
+        pollSCM 'H/2 * * * *'
+    }
+    
+    # Retrying the pipeline for 5 times if it fails
+    options {
+        retry(5)
+    }
+    
+    # Setting environment variables for the pipeline
+    environment {
+        PROJECT_NAME='helpdesk-backend'
+        PROJECT_GIT_URL='git@github.com:ArasKargo/HelpDesk.Backend.git'
+        PROJECT_BRANCH='dev'
+   # Docker registry configurations
+        DOCKER_REGISTRY='dockerregistry-test.araskargo.com.tr'
+        DOCKER_CREDENTIAL_NAME='dockerregistry-test-credentials'
+        IMAGE_NAME='helpdeskbackend'
+    }
+    
+    # Main stages of the pipeline
+    stages {
+        # Initialization stage to set the build name
+        stage("Initialization") {
+            steps {
+                buildName "| PROJECT: ${PROJECT_NAME} | BUILD_ID: ${env.BUILD_ID} | BRANCH: ${PROJECT_BRANCH} |"
+            }
+        }
+        
+        # Checking out the source code from Git
+        stage('Cloning Git') {
+            steps {
+                checkout(poll: true, scm: [
+                    $class: 'GitSCM', 
+                    branches: [[name: "${PROJECT_BRANCH}"]],
+                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${PROJECT_NAME}"]],
+                    doGenerateSubmoduleConfigurations: false,
+                    userRemoteConfigs: [[credentialsId: 'jenkins-github', url: "${PROJECT_GIT_URL}"]]
+                ])
+            }
+        }
+        
+        # Building the Docker image
+        stage('Building image') {
+            steps {
+                script { 
+                    def dockerfilePath = "./${PROJECT_NAME}/Dockerfile"
+                    dir("${PROJECT_NAME}") {
+                        dockerImage = docker.build("${IMAGE_NAME}:${env.BUILD_ID}")
+                    }
+                }
+            }
+        }
+        
+        # Pushing the Docker image to the specified registry
+        stage('Push Image to Registry') {
+            steps {
+                script {
+                    docker.withRegistry( "http://${DOCKER_REGISTRY}", "${DOCKER_CREDENTIAL_NAME}" ) {
+                        dockerImage.push("${env.BUILD_ID}")
+                    }
+                }
+            }
+        }
+        
+        # Verifying if the image was successfully pushed to the registry
+        stage('Verify Image Push') {
+            steps {
+                script {
+                    sh "docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${env.BUILD_ID}"
+                }
+            }
+        }
+        
+        # Pushing changes to the Git repository for ArgoCD to detect
+        stage('Deploy App') {
+            steps {
+                script {
+                    dir("${PROJECT_NAME}") {
+                        sh "git add ."
+                        sh "git commit -m 'Update from Jenkins Build #${env.BUILD_ID}'"
+                        sh "git push origin ${PROJECT_BRANCH}"
+                    }
+                }
+            }
+        }
+    }
+}
+
+# Cleaning up the built Docker image to free up space
+stage('Clean Up') {
+    steps {
+        script {
+            try{
+                # Attempt to remove the Docker image
+                sh 'docker image rm ${IMAGE_NAME}:${BUILD_ID}'
+            }
+            # Catch any errors that may occur during the removal process
+            catch(err){}
+        }
+    }
+}
+
+# Post-build actions
+post {
+    # If the build is successful, send a notification to Google Chat
+    success {
+        hangoutsNotifySuccess tokenCredentialId: "Engineerz", threadByJob: false
+    }
+    # If the build fails, send a failure notification to Google Chat
+    failure{
+        hangoutsNotifyFailure tokenCredentialId: "Engineerz", threadByJob: false
+    }
+}

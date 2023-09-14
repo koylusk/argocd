@@ -1,0 +1,169 @@
+apiVersion: v1
+data:
+  algorithm: HS256
+  aras_web_api_url: https://apitest.araskargo.com.tr/
+  bucket_name: helpdesk-testing-static
+  cdn_access_key: devopsuser
+  cdn_read_path: https://cdn-test.araskargo.com.tr/helpdesk-testing-static
+  cdn_secret_key: vpxf63QD25WnmB18
+  cdn_upload_url: cdn-test.araskargo.com.tr
+  cdn_use_ssl: true
+  db_name: HelpDeskDB
+  frontend_url: https://helpdesktest.araskargo.com.tr/
+  mongo_url: mongodb://helpDeskDBOwner:L1cDs52HD2mw659S@172.16.72.20:27017,172.16.72.21:27017,172.16.72.22:27017/?authMechanism=SCRAM-SHA-1&authSource=HelpDeskDB
+  secret: GoodSecretItIs
+kind: ConfigMap
+metadata:
+  name: app-config
+---
+apiVersion: v1
+data:
+  APPLICATIONINSIGHTS_CONNECTION_STRING: InstrumentationKey=7e8e16b3-be21-452f-a6b9-6d24bf0e0d15;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/
+  CONTAINER_NAME: helpdesk-backend-container
+  DEPLOYMENT_APP_LABEL: c
+  DEPLOYMENT_NAME: helpdesk-backend-app-deployment
+  DEPLOYMENT_NAMESPACE: aras-helpdesk
+  DOCKER_CREDENTIAL_NAME: dockerregistry-test-credentials
+  DOCKER_REGISTRY: dockerregistry-test.araskargo.com.tr
+  IMAGE_NAME: helpdeskbackend
+  IMAGE_PULL_SECRETS_ID: nexus-test-repo
+  KUBERNETES_CREDENTIAL_ID: new_test_kubeconf_secret
+  TEMPLATE_DEPLOYMENT_FILE_PATH: backend/deployment.template.yml
+  TEMPLATE_DOCKER_FILE_PATH: backend/Dockerfile.template
+  TIMEZONE: Europe/Istanbul
+kind: ConfigMap
+metadata:
+  name: k8s-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: helpdesk-backend-service
+  namespace: aras-helpdesk
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: helpdesk-backend-app
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helpdesk-backend-app-deployment
+  namespace: aras-helpdesk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helpdesk-backend-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 50%
+  template:
+    metadata:
+      labels:
+        app: helpdesk-backend-app
+    spec:
+      containers:
+      - env:
+        - name: CONTAINER_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: CONTAINER_NAME
+              name: k8s-config
+        - name: DOCKER_REGISTRY
+          valueFrom:
+            configMapKeyRef:
+              key: DOCKER_REGISTRY
+              name: k8s-config
+        - name: DOCKER_CREDENTIAL_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: DOCKER_CREDENTIAL_NAME
+              name: k8s-config
+        - name: IMAGE_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: IMAGE_NAME
+              name: k8s-config
+        - name: TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              key: TIMEZONE
+              name: k8s-config
+        - name: IMAGE_PULL_SECRETS_ID
+          valueFrom:
+            configMapKeyRef:
+              key: IMAGE_PULL_SECRETS_ID
+              name: k8s-config
+        - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+          valueFrom:
+            configMapKeyRef:
+              key: APPLICATIONINSIGHTS_CONNECTION_STRING
+              name: k8s-config
+        - name: secret
+          valueFrom:
+            configMapKeyRef:
+              key: secret
+              name: app-config
+        - name: algorithm
+          valueFrom:
+            configMapKeyRef:
+              key: algorithm
+              name: app-config
+        - name: mongo_url
+          valueFrom:
+            configMapKeyRef:
+              key: mongo_url
+              name: app-config
+        - name: db_name
+          valueFrom:
+            configMapKeyRef:
+              key: db_name
+              name: app-config
+        - name: aras_web_api_url
+          valueFrom:
+            configMapKeyRef:
+              key: aras_web_api_url
+              name: app-config
+        - name: frontend_url
+          valueFrom:
+            configMapKeyRef:
+              key: frontend_url
+              name: app-config
+        - name: cdn_upload_url
+          valueFrom:
+            configMapKeyRef:
+              key: cdn_upload_url
+              name: app-config
+        - name: cdn_read_path
+          valueFrom:
+            configMapKeyRef:
+              key: cdn_read_path
+              name: app-config
+        - name: cdn_access_key
+          valueFrom:
+            configMapKeyRef:
+              key: cdn_access_key
+              name: app-config
+        - name: cdn_secret_key
+          valueFrom:
+            configMapKeyRef:
+              key: cdn_secret_key
+              name: app-config
+        - name: cdn_use_ssl
+          valueFrom:
+            configMapKeyRef:
+              key: cdn_use_ssl
+              name: app-config
+        - name: bucket_name
+          valueFrom:
+            configMapKeyRef:
+              key: bucket_name
+              name: app-config
+      imagePullSecrets:
+      - name: nexus-test-repo
